@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+  namespace: default
+  labels:
+    app: db
+spec:
+  replicas: 1
+  serviceName: db
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: db
+          image: mysql/mysql-server:5.6
+          ports:
+            - containerPort: 3306
+              name: db
+          env:
+            - name: MYSQL_ALLOW_EMPTY_PASSWORD
+              value: 'yes'
+            - name: MYSQL_PASSWORD
+              value: 'root'
+            - name: MYSQL_ROOT_HOST
+              value: '%'
+            - name: MYSQL_USER
+              value: 'root'
+          volumeMounts:
+            - name: mysql-initdb-config
+              mountPath: /etc/mysql
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-initdb-config
+          configMap:
+            name: db-configmap-cnf
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-data
+      spec:
+        storageClassName: standard
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
