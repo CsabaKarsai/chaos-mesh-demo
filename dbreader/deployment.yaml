@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dbreader
+  namespace: default
+  labels:
+    app: dbreader
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dbreader
+  template:
+    metadata:
+      labels:
+        app: dbreader
+    spec:
+      containers:
+        - name: dbreader
+          image: dbreader:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3001
+              name: dbreader
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
